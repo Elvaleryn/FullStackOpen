@@ -11,7 +11,7 @@ const App = () => {
     const [newNumber, setNewNumber] = useState('')
     const [filter, setFiltered] = useState("")
     const [message, setMessage] = useState(null)
-    const [messageType, setMessageType] = useState(null)
+    const [messageStyle, setMessageStyle] = useState(null)
 
     useEffect(() => {
         personsService.getAll().then(response => {
@@ -40,32 +40,35 @@ const App = () => {
         if (persons.map(person => person.name.toLowerCase()).indexOf(newName.toLowerCase()) === -1) {
             personsService.create(personObject).then(response => {
                 setPersons(persons.concat(personObject))
-                setMessage(`${newName} is added to phonebook`)
-                setMessageType("success")
+                setMessage(`${newName} is added`)
+                setMessageStyle("success")
+                
                 setTimeout(() => {
                     setMessage(null)
-                    setMessageType(null)
-                }, 2000)
+                    setMessageStyle(null)
+                    window.location.reload()
+                }, 1000)
+                
             })
         } else {
-            if (window.confirm(`${newName} is already in the phone book, replace the old number with the new one?`)) {
+            if (window.confirm(`${newName} is already in the phone book, do you want to replace the old number with the new one?`)) {
                 const personToUpdate = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
                 personsService.update(personToUpdate.id, { name: newName, number: newNumber })
                     .then(response => {
                         setPersons(persons.map(person => person.id !== personToUpdate.id ? person : response.data))
                         setMessage(`${newName}'s number has changed`)
-                        setMessageType("success")
+                        setMessageStyle("success")
                         setTimeout(() => {
                             setMessage(null)
-                            setMessageType(null)
+                            setMessageStyle(null)
                         }, 2000);
                     }).catch(error => {
                         setMessage(`${newName} has already been deleted`)
-                        setMessageType("error")
+                        setMessageStyle("error")
                         setPersons(persons.filter(p => p.id !== personToUpdate.id))
                         setTimeout(() => {
                             setMessage(null)
-                            setMessageType(null)
+                            setMessageStyle(null)
 
                         }, 2000)
                     })
@@ -76,7 +79,7 @@ const App = () => {
 
         setNewName("")
         setNewNumber("")
-        window.location.reload();
+        
 
 
     }
@@ -91,19 +94,19 @@ const App = () => {
                 .then(response => {
                     setPersons(persons.filter(p => p.id !== id))
                     setMessage(`${personToRemove.name} has been removed`)
-                    setMessageType("success")
+                    setMessageStyle("success")
                     setTimeout(() => {
                         setMessage(null)
-                        setMessageType(null)
+                        setMessageStyle(null)
 
                     }, 2000)
                     
                 }).catch(error => {
                     setMessage(`Error: ${error.response.data.error}`)
-                    setMessageType("error")
+                    setMessageStyle("error")
                     setTimeout(() => {
                         setMessage(null)
-                        setMessageType(null)
+                        setMessageStyle(null)
 
                     }, 2000)
                 })
@@ -114,7 +117,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
-            <Notifications message={message} messageType={messageType} />
+            <Notifications message={message} messageStyle={messageStyle} />
             <Filter handleFilterChange={handleFilterChange} filter={filter} />
             <h2>Add new person</h2>
             <PersonForm handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} addPerson={addPerson} newName={newName} newNumber={newNumber} />
