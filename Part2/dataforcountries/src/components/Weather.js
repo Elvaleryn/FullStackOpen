@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import axios from "axios"
+import weatherService from "../services/weather"
 
 const Weather = ({ capital }) => {
 
     const [weather, setWeather] = useState({ current: { temp_c: '', wind_kph: '', wind_dir: '', condition: { icon: '', text: '' } } })
 
     useEffect(() => {
-        axios
-            .get(`http://api.apixu.com/v1/current.json?key=8b0b7389d44749cdad8201314192706&q=${capital}`)
-            .then(response => {
-                setWeather(response.data)
-            })
+        weatherService.getWeather(capital).then((response) => 
+            setWeather(response.data)
+        )
+
     }, [capital])
 
     console.log(weather);
